@@ -1,0 +1,228 @@
+# opsmpi.tcl
+# Emulated OpenSeesMP MPI commands via the tclmpi package.
+################################################################################
+# Copyright 2021 Alex Baker <ambaker1@mtu.edu>
+#
+# Redistribution and use in source and binary forms, with or without 
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice, 
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice, 
+# this list of conditions and the following disclaimer in the documentation 
+# and/or other materials provided with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its contributors 
+# may be used to endorse or promote products derived from this software without 
+# specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+# POSSIBILITY OF SUCH DAMAGE.
+################################################################################
+
+# Uses the tclmpi package, written by Axel Kohlmeyer, 2017
+# http://sites.google.com/site/akohlmey/software/tclmpi
+
+# The OpenSeesMP commands getPID, getNP, send, recv, and barrier are emulated 
+# using bindings to MPI commands provided by the tclmpi package.
+# The puts, logFile, and exit commands are also modified to better support this
+# portable parallel version of OpenSees. 
+
+# Require the package and initialize the mpi environment
+package require tclmpi
+::tclmpi::init
+
+# Define the namespace for opsmpi
+namespace eval ::opsmpi {
+    variable rank [::tclmpi::comm_rank tclmpi::comm_world]
+    variable size [::tclmpi::comm_size tclmpi::comm_world]
+    variable log 0; # Whether stderr (and puts) are redirected to log
+    variable echo 1; # Whether output goes to screen
+    namespace export getPID getNP send recv barrier puts logFile exit
+}
+
+# getPID --
+# Return the rank of the process
+proc ::opsmpi::getPID {} {
+    variable rank
+    return $rank
+}
+
+# getNP --
+# Return the size of the parallel pool
+proc ::opsmpi::getNP {} {
+    variable size
+    return $size
+}
+
+# send --
+# Send message to specified PID
+proc ::opsmpi::send {args} {
+    variable rank
+    variable size
+    # Switch for arity
+    if {[llength $args] == 3} {
+        lassign $args -pid pid data
+    } elseif {[llength $args] == 2} {
+        lassign $args pid data
+    } else {
+        return -code error "Incorrect number of arguments"
+    }
+    # Check validity of pid input
+    if {![string is integer -strict $pid]} {
+        return -code error "pid must be integer"
+    } elseif {$pid < 0 || $pid >= $size} {
+        return -code error "pid out of range"
+    } elseif {$pid == $rank} {
+        return -code error "cannot send to self"
+    }
+    ::tclmpi::send $data tclmpi::auto $pid 0 tclmpi::comm_world
+    return
+}
+
+# recv --
+# Receive message to specified PID (or any PID)
+proc ::opsmpi::recv {args} {
+    variable rank
+    variable size
+    # Switch for arity
+    if {[llength $args] == 3} {
+        lassign $args -pid pid varName
+    } elseif {[llength $args] == 2} {
+        lassign $args pid varName
+    } else {
+        return -code error "Incorrect number of arguments"
+    }
+    # Check validity of pid input
+    if {![string is integer -strict $pid]} {
+        if {$pid in {ANY ANY_SOURCE MPI_ANY_SOURCE}} {
+            set pid tclmpi::any_source
+        } else {
+            return -code error "pid must be integer or \"ANY\""
+        }
+    } elseif {$pid < 0 || $pid >= $size} {
+        return -code error "pid out of range"
+    } elseif {$pid == $rank} {
+        return -code error "cannot receive from self"
+    }
+    upvar $varName message
+    set message [::tclmpi::recv tclmpi::auto $pid tclmpi::any_tag \
+            tclmpi::comm_world]
+}
+
+# barrier --
+# Wait until all processes reach barrier
+proc ::opsmpi::barrier {} {
+    ::tclmpi::barrier tclmpi::comm_world
+}
+
+# Redefine puts command to send results to stdout
+rename puts ::opsmpi::ops_puts
+proc ::opsmpi::puts {args} {
+    variable log
+    variable echo
+    set nonewline 0
+    set chan stdout; # Default channel (different than traditional OpenSees)
+    set string [lindex $args end]
+    switch [llength $args] {
+        1 { # puts $string (normal case)
+        }
+        2 { # puts -nonewline $string || puts $chan $string
+            set arg [lindex $args 0]
+            if {$arg eq "-nonewline"} {
+                set nonewline 1
+            } else {
+                set chan $arg
+            }
+        }
+        3 { # puts -nonewline $chan $string
+            lassign $args option chan
+            if {$option eq "-nonewline"} {
+                set nonewline 1
+            } else {
+                # Invalid option
+                return -code error "wrong # args: should be \"puts ?-nonewline?\
+                        ?channelId? string\""
+            }
+        }
+        default {
+            # Wrong number of arguments
+            return -code error "wrong # args: should be \"puts ?-nonewline?\
+                    ?channelId? string\""
+        }
+    }
+    # Switch for channel (stdout is the usual case)
+    if {$chan eq "stdout"} {
+        # send to opserr and stdout
+        if {$nonewline} {
+            if {$log} {
+                ops_puts -nonewline $string
+            }
+            if {$echo} {
+                oldputs -nonewline $string
+            }
+        } else {
+            if {$log} {
+                ops_puts $string
+            }
+            if {$echo} {
+                oldputs $string
+            }
+        }
+    } else {
+        # write to specified channel
+        if {$nonewline} {
+            oldputs -nonewline $chan $string
+        } else {
+            oldputs $chan $string
+        }
+    }
+    return
+}
+
+# Redefine OpenSees logFile command to prevent unneeded stderr buffer
+rename logFile ::opsmpi::ops_logFile
+proc ::opsmpi::logFile {args} {
+    variable log 1
+    variable echo
+    if {"-noEcho" in $args} {
+        set echo 0
+    }
+    ops_logFile {*}$args -noEcho
+    return
+}
+
+# Redefine exit to finalize MPI environment
+rename exit ::opsmpi::ops_exit
+proc ::opsmpi::exit {args} {
+    variable rank
+    variable echo 1
+    puts "Process $rank terminating"
+    ::tclmpi::finalize
+    ops_exit {*}$args
+}
+
+# Import all commands into global (force)
+namespace import -force ::opsmpi::*
+
+# Strip "filename" argument from argv
+set argv [lassign $argv filename]
+
+# Source the file, with error control
+if {[catch {source $filename} result options]} {
+    puts "Error in process [getPID]: [dict get $options -errorinfo]"
+    ::tclmpi::abort tclmpi::comm_world [dict get $options -code]
+}
+
+# Call modified exit command (finalizes tclmpi environment)
+exit
