@@ -1,5 +1,5 @@
 # opsmpi.tcl
-# Emulated OpenSeesMP MPI commands via the tclmpi package.
+# OpenSeesMP MPI commands via the TclMPI package.
 ################################################################################
 # Copyright 2021 Alex Baker <ambaker1@mtu.edu>
 #
@@ -30,13 +30,23 @@
 # POSSIBILITY OF SUCH DAMAGE.
 ################################################################################
 
-# Uses the tclmpi package, written by Axel Kohlmeyer, 2017
-# http://sites.google.com/site/akohlmey/software/tclmpi
+# Uses the TclMPI package for MPI bindings
+# Axel Kohlmeyer. (2021). TclMPI: Release 1.1 [Data set]. Zenodo. 
+# DOI: 10.5281/zenodo.545847
 
-# The OpenSeesMP commands getPID, getNP, send, recv, and barrier are emulated 
-# using bindings to MPI commands provided by the tclmpi package.
-# The puts, logFile, and exit commands are also modified to better support this
-# portable parallel version of OpenSees. 
+# This file replicates the message-passing functionality provided in OpenSeesMP.
+# Additional MPI functionality can be accessed with TclMPI commands.
+
+# To prevent the command-window from being cluttered from the unbuffered 
+# OpenSees error channel (especially the header), the "puts" and "logFile" 
+# commands are modified, so that OpenSees warnings will only show in log files.
+
+# To ensure that the TclMPI environment is properly handled, the "exit" command
+# is modified to display a "Process terminating" message and to call 
+# ::tclmpi::finalize before calling the real "exit" command.
+
+# Ensure that an input arg exists (used by OpenSeesMPI.exe to get header)
+if {[llength $argv] == 0} return
 
 # Require the package and initialize the mpi environment
 package require tclmpi
