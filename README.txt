@@ -2,23 +2,24 @@ OpenSeesMPI is a simple alternative to OpenSeesMP, the parallel interpreter vers
 OpenSeesMPI is easy to set up because it does not require compiling a parallel version of OpenSees. 
 OpenSeesMPI instead uses TclMPI, a Tcl package that provides MPI bindings through a dynamic linker library (.dll) or shared object (.so) file [2].
 Because of this, OpenSeesMPI only replicates the message-passing functionality of OpenSeesMP (getPID, getNP, send, recv and barrier). 
-If parallelization of the finite element domain is required, OpenSeesSP or OpenSeesMP must be used. 
+If parallelization of the finite element domain is required, OpenSeesSP or OpenSeesMP can be used. 
 
-# Compiling
+# Requirements:
+Must have mpiexec and OpenSees installed and on the path. OpenSees must be installed within a complete Tcl installation (not the light-weight version included with OpenSees download), and the TclMPI package must be installed and available via "package require".
 
-To compile on Windows, install ps2exe as a powershell module, and run the following command in the source directory: 
+# Basic Use
+Linking to TclMPI is accomplished with the wrapper script opsmpi.tcl. To run a file in OpenSeesMPI (say, "input.tcl"), simply call the following, where <np> represents the number of parallel processes.
 `
-ps2exe .\OpenSeesMPI.ps1 .\OpenSeesMPI.exe
+mpiexec -n <np> OpenSees opsmpi.tcl <inputfile> 
 `
 
-# Installation
-To install, place OpenSeesMPI.exe and opsmpi.tcl in your Tcl installation binary folder. 
-Must have a complete Tcl installation (not the light-weight version included with OpenSees download), and TclMPI installed in the Tcl lib folder. 
-
-# Use
-To use, simply call as if calling mpiexec, with the last argument being the .tcl input file, as shown below:
+# Windows Batch File
+Alternatively, a batch file has been included for ease of use on Windows. 
+To use this method, place OpenSeesMPI.bat and opsmpi.tcl in your Tcl installation binary folder.
+Then, OpenSeesMPI can be called as shown below. 
+Other MPI options can also be included, as long as the last argument is the input file.
 `
-OpenSeesMPI -n 5 input.tcl
+OpenSeesMPI -n <np> <inputfile>
 `
 
 # Citing
