@@ -45,8 +45,10 @@
 # is modified to display a "Process terminating" message and to call 
 # ::tclmpi::finalize before calling the real "exit" command.
 
-# Ensure that an input arg exists (used by OpenSeesMPI.exe to get header)
-if {[llength $argv] == 0} return
+# Ensure that an input arg exists (used by OpenSeesMPI.bat to get header)
+if {[llength $argv] == 0} {
+    return
+}
 
 # Require the package and initialize the mpi environment
 package require tclmpi
