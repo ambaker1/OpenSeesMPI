@@ -24,9 +24,6 @@ Other MPI options can also be included, as long as the last argument is the inpu
 OpenSeesMPI -n <np> <inputfile>
 `
 
-# Citing
-Baker, A. (2021). OpenSeesMPI (0.0) [Windows].
-
 # Citations
 1. Mckenna, F. (2011). OpenSees: A Framework for Earthquake Engineering Simulation. Computing in Science & Engineering, 13(4), 58–66. https://doi.org/10.1109/MCSE.2011.66
 2. Axel Kohlmeyer. (2021). TclMPI: Release 1.1 [Data set]. Zenodo. DOI: 10.5281/zenodo.545847
