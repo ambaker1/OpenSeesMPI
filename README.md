@@ -9,6 +9,7 @@ Must have mpiexec and OpenSees installed and on the path. OpenSees must be insta
 
 # Basic Use
 Linking to TclMPI is accomplished with the wrapper script opsmpi.tcl. To run a file in OpenSeesMPI (say, "input.tcl"), simply call the following, where <np> represents the number of parallel processes.
+  
 `
 mpiexec -n <np> OpenSees opsmpi.tcl <inputfile> 
 `
@@ -18,6 +19,7 @@ Alternatively, a batch file has been included for ease of use on Windows.
 To use this method, place OpenSeesMPI.bat and opsmpi.tcl in your Tcl installation binary folder.
 Then, OpenSeesMPI can be called as shown below. 
 Other MPI options can also be included, as long as the last argument is the input file.
+  
 `
 OpenSeesMPI -n <np> <inputfile>
 `
