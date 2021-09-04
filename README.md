@@ -32,4 +32,4 @@ Baker, A. (2021). OpenSeesMPI (0.0) [Windows].
 2. Axel Kohlmeyer. (2021). TclMPI: Release 1.1 [Data set]. Zenodo. DOI: 10.5281/zenodo.545847
 
 # Acknowledgements
-Thanks to Dr. Daniel M. Dowden for being a supportive research advisor, and thanks to Dr. Axel Kohlmeyer for putting in the work to make TclMPI work on Windows, and guiding me in this process.
+Thanks to Dr. Axel Kohlmeyer for helping me compile TclMPI on Windows, and thanks to Dr. Daniel M. Dowden for being a supportive research advisor.
