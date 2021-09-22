@@ -15,6 +15,8 @@ Other MPI options can also be included, as long as the last argument is the inpu
 `
 OpenSeesMPI -n <np> <inputfile>
 `
+
+If someone wants to contribute the equivalent of "OpenSeesMPI.bat" for Linux and Mac OS, that would be fantastic! It just parses inputs and passes them to mpiexec and OpenSees.
   
 # Command Documentation
 Functionality is compatible with OpenSeesMP, with a few minor changes.
