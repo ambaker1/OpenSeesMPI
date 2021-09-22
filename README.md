@@ -5,7 +5,7 @@ Because of this, OpenSeesMPI only replicates the message-passing functionality o
 If parallelization of the finite element domain is required, OpenSeesSP or OpenSeesMP can be used. 
 
 # Requirements:
-Must have mpiexec and OpenSees installed and on the path. OpenSees must be installed within a complete Tcl installation (not the light-weight version included with OpenSees download), and the TclMPI package must be installed and available via "package require".
+Must have mpiexec and OpenSees installed and on the path. OpenSees must be installed within a complete Tcl installation (not the light-weight version included with OpenSees download), and the TclMPI package must be installed and available via "package require". 
 
 # Installation and Use:
 For Windows, copy "OpenSeesMPI.bat" and "opsmpi.tcl" to your Tcl installation binary folder.
@@ -43,7 +43,7 @@ Functionality is compatible with OpenSeesMP, with a few minor changes.
 
 # Citations
 1. Mckenna, F. (2011). OpenSees: A Framework for Earthquake Engineering Simulation. Computing in Science & Engineering, 13(4), 58–66. https://doi.org/10.1109/MCSE.2011.66
-2. Axel Kohlmeyer. (2021). TclMPI: Release 1.1 [Data set]. Zenodo. DOI: 10.5281/zenodo.545847
+2. Axel Kohlmeyer. (2021). TclMPI: Release 1.1 [Data set]. Zenodo. DOI: 10.5281/zenodo.598343
 
 # Acknowledgements
 Thanks to Dr. Axel Kohlmeyer for helping me compile TclMPI on Windows, and thanks to Dr. Daniel M. Dowden for being a supportive research advisor.
