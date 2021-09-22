@@ -16,6 +16,31 @@ Other MPI options can also be included, as long as the last argument is the inpu
 OpenSeesMPI -n <np> <inputfile>
 `
 
+If someone wants to contribute the equivalent of "OpenSeesMPI.bat" for Linux and Mac OS, that would be fantastic! It just parses inputs and passes them to mpiexec and OpenSees.
+  
+# Command Documentation
+Functionality is compatible with OpenSeesMP, with a few minor changes.
+  
+* The command _getPID_ returns the integer rank of the process, using the TclMPI binding _::tclmpi::comm_rank_.
+  
+  `getPID` 
+  
+* The command _getNP_ returns the number of parallel processes, using the TclMPI binding _::tclmpi::comm_size_.
+  
+  `getNP` 
+  
+* The command _send_ sends $data from the current process to process $pid, using the TclMPI binding _::tclmpi::send_. Note that the prefix "-pid" is optional with OpenSeesMPI but mandatory in OpenSeesMP.
+  
+  `send <-pid> $pid $data`
+  
+* The command _recv_ receives data from process $pid, and stores it in variable $varName, using the TclMPI binding _::tclmpi::recv_. If $pid is "ANY", it will receive from any process. Note that the prefix "-pid" is optional with OpenSeesMPI but mandatory in OpenSeesMP.
+  
+  `recv <-pid> $pid $varName`
+  
+* The command _barrier_ waits for all processes to reach the barrier, using the TclMPI binding _::tclmpi::barrier_.
+  
+  `barrier`
+
 # Citations
 1. Mckenna, F. (2011). OpenSees: A Framework for Earthquake Engineering Simulation. Computing in Science & Engineering, 13(4), 58–66. https://doi.org/10.1109/MCSE.2011.66
 2. Axel Kohlmeyer. (2021). TclMPI: Release 1.1 [Data set]. Zenodo. DOI: 10.5281/zenodo.545847
