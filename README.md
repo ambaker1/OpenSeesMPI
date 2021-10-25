@@ -40,6 +40,8 @@ Functionality is compatible with OpenSeesMP, with a few minor changes.
 * The command _barrier_ waits for all processes to reach the barrier, using the TclMPI binding _::tclmpi::barrier_.
   
   `barrier`
+  
+Additionally, more advanced MPI commands are available through the TclMPI package, which is documented here: https://akohlmey.github.io/tclmpi/
 
 # Citations
 1. Mckenna, F. (2011). OpenSees: A Framework for Earthquake Engineering Simulation. Computing in Science & Engineering, 13(4), 58–66. https://doi.org/10.1109/MCSE.2011.66
