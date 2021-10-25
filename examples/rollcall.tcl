@@ -14,6 +14,3 @@ if {[getPID] == 0} {
     }
 }
 barrier
-# puts "hello world"
-# barrier
-
