@@ -8,7 +8,7 @@ If parallelization of the finite element domain is required, OpenSeesSP or OpenS
 Must have mpiexec and OpenSees installed and on the path. OpenSees must be installed within a complete Tcl installation (not the light-weight version included with OpenSees download), and the TclMPI package must be installed and available via "package require". 
 
 # Installation and Use:
-Run the installer in the "install" folder.
+Run the installer in the latest release.
 Then, OpenSeesMPI can be called as shown below, where <np> represents the number of parallel processes, and <inputFile> represents the Tcl input script.
 Other MPI options can also be included, as long as the last argument is the input file.
   
@@ -48,4 +48,4 @@ Additionally, more advanced MPI commands are available through the TclMPI packag
 2. Axel Kohlmeyer. (2021). TclMPI: Release 1.1 [Data set]. Zenodo. DOI: 10.5281/zenodo.598343
 
 # Acknowledgements
-Thanks to Dr. Axel Kohlmeyer for helping me compile TclMPI on Windows, and thanks to Dr. Daniel M. Dowden for being a supportive research advisor.
+Thanks to Dr. Axel Kohlmeyer for making TclMPI available on Windows.
