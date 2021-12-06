@@ -1,30 +1,27 @@
+# OpenSeesMPI
 OpenSeesMPI is a simple alternative to OpenSeesMP, the parallel interpreter version of OpenSees that allows for message passing and parallelization of the finite element domain [1]. 
 OpenSeesMPI is easy to set up because it does not require compiling a parallel version of OpenSees. 
 OpenSeesMPI instead uses TclMPI, a Tcl package that provides MPI bindings through a dynamic linker library (.dll) or shared object (.so) file [2].
 Because of this, OpenSeesMPI only replicates the message-passing functionality of OpenSeesMP (getPID, getNP, send, recv and barrier). 
 If parallelization of the finite element domain is required, OpenSeesSP or OpenSeesMP can be used. 
 
-# Requirements:
+## Requirements:
 Must have mpiexec and OpenSees installed and on the path. OpenSees must be installed with a complete Tcl installation, and the TclMPI package must be installed and available via "package require". 
 
-# Installation and Basic Use:
+## Installation and Basic Use:
 Run the installer in the latest release.
-Then, OpenSeesMPI can be called as shown below, where *np* represents the number of parallel processes, and *inputFile* represents the Tcl input script.
+Then, OpenSeesMPI can be called as shown below, where $np represents the number of parallel processes, and $inputFile represents the Tcl input script.
 
-`
-OpenSeesMPI **-n** *np* *inputfile*
-`
+`OpenSeesMPI -n $np $inputfile`
   
-# Advanced Use:
-Arguments up to the last argument or up to **--** are taken as mpiexec options.
+## Advanced Use:
+Arguments up to the last argument or up to "--" are taken as mpiexec options.
 The remaining arguments are taken as the input file and the input arguments.
-If input arguments are desired, the option terminator **--** must be used.
+If input arguments are desired, the option terminator "--" must be used.
 
-`
-OpenSeesMPI ?*options*? ?**--**? *inputFile* ?*inputArgs*?
-`
+`OpenSeesMPI <$opt1 $opt2 ...> <--> $inputFile <$arg1 $arg2 ...>`
   
-# Command Documentation
+## Command Documentation
 Functionality is compatible with OpenSeesMP, with a few additional features.
   
 * The command _getPID_ returns the integer rank of the process, using the TclMPI binding _::tclmpi::comm_rank_.
@@ -53,12 +50,12 @@ Functionality is compatible with OpenSeesMP, with a few additional features.
   
 Additionally, more advanced MPI commands are available through the TclMPI package, which is documented here: https://akohlmey.github.io/tclmpi/
 
-# Citations
+## Citations
 1. Mckenna, F. (2011). OpenSees: A Framework for Earthquake Engineering Simulation. Computing in Science & Engineering, 13(4), 58–66. https://doi.org/10.1109/MCSE.2011.66
-2. Axel Kohlmeyer. (2021). TclMPI: Release 1.1 [Data set]. Zenodo. DOI: 10.5281/zenodo.598343
+2. Axel Kohlmeyer. (2021). TclMPI: Release 1.2 [Data set]. Zenodo. DOI: 10.5281/zenodo.5637677
 
-# Acknowledgements
+## Acknowledgements
 Thanks to Dr. Axel Kohlmeyer for making TclMPI available on Windows.
 
-# To Do:
+## To Do:
 * Provide Linux and Mac OS equivalents of OpenSeesMPI.bat
