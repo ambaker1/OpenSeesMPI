@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "OpenSeesMPI"
-#define MyAppVersion "1.0"
+#define MyAppVersion "1.1"
 #define MyAppPublisher "Alex Baker"
 #include "environment.iss"
 
@@ -12,9 +12,8 @@
 AppId={{9233013C-3B5B-461A-84B3-143710FC5BED}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-;AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
-DefaultDirName={commonpf}\OpenSeesMPI
+DefaultDirName={commonpf64}\OpenSeesMPI
 DisableWelcomePage=no
 DisableDirPage=no
 DefaultGroupName={#MyAppName}
@@ -24,7 +23,6 @@ OutputDir=.
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
-WizardImageFile=logo.bmp
 ChangesEnvironment=true
 
 [Languages]

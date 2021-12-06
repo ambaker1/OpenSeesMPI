@@ -31,7 +31,7 @@
 ################################################################################
 
 # Uses the TclMPI package for MPI bindings
-# Axel Kohlmeyer. (2021). TclMPI: Release 1.1 [Data set]. Zenodo. 
+# Axel Kohlmeyer. (2021). TclMPI: Release 1.2 [Data set]. Zenodo. 
 # DOI: 10.5281/zenodo.545847
 
 # This file replicates the message-passing functionality provided in OpenSeesMP.
@@ -45,13 +45,13 @@
 # is modified to display a "Process terminating" message and to call 
 # ::tclmpi::finalize before calling the real "exit" command.
 
-# Ensure that an input arg exists (used by OpenSeesMPI.bat to get header)
+# Ensure that an input arg exists
 if {[llength $argv] == 0} {
-    return
+    return -code error "Must specify OpenSees file"
 }
 
 # Require the package and initialize the mpi environment
-package require tclmpi
+package require tclmpi 1.2
 ::tclmpi::init
 
 # Define the namespace for opsmpi
@@ -60,7 +60,8 @@ namespace eval ::opsmpi {
     variable size [::tclmpi::comm_size tclmpi::comm_world]
     variable log 0; # Whether stderr (and puts) are redirected to log
     variable echo 1; # Whether output goes to screen
-    namespace export getPID getNP send recv barrier puts logFile exit
+    namespace export getPID getNP send recv barrier bcast; # Parallel commands
+    namespace export puts logFile exit; # Modified OpenSees commands
 }
 
 # getPID --
@@ -79,6 +80,7 @@ proc ::opsmpi::getNP {} {
 
 # send --
 # Send message to specified PID
+# send <-pid> $pid $data
 proc ::opsmpi::send {args} {
     variable rank
     variable size
@@ -104,18 +106,20 @@ proc ::opsmpi::send {args} {
 
 # recv --
 # Receive message to specified PID (or any PID)
+# recv <-pid> $pid <$varName>
 proc ::opsmpi::recv {args} {
     variable rank
     variable size
-    # Switch for arity
-    if {[llength $args] == 3} {
-        lassign $args -pid pid varName
-    } elseif {[llength $args] == 2} {
-        lassign $args pid varName
-    } else {
+    # Check for optional -pid argument, and strip arg list.
+    if {[lindex $args 0] eq {-pid}} {
+        set args [lrange $args 1 end]
+    }
+    # Check arity
+    if {[llength $args] < 1 || [llength $args] > 2} {
         return -code error "Incorrect number of arguments"
     }
     # Check validity of pid input
+    set pid [lindex $args 0]
     if {![string is integer -strict $pid]} {
         if {$pid in {ANY ANY_SOURCE MPI_ANY_SOURCE}} {
             set pid tclmpi::any_source
@@ -127,9 +131,21 @@ proc ::opsmpi::recv {args} {
     } elseif {$pid == $rank} {
         return -code error "cannot receive from self"
     }
-    upvar $varName message
+    # Option to link to variable
+    if {[llength $args] == 2} {
+        set varName [lindex $args 1]
+        upvar $varName message
+    }
+    # Call TclMPI binding, saving to message variable and returning the value
     set message [::tclmpi::recv tclmpi::auto $pid tclmpi::any_tag \
             tclmpi::comm_world]
+}
+
+# bcast --
+# Broadcast data from PID 0 to all other processes
+# bcast <$data>
+proc ::opsmpi::bcast {{data ""}} {
+    ::tclmpi::bcast $data tclmpi::auto 0 tclmpi::comm_world
 }
 
 # barrier --
@@ -226,6 +242,7 @@ proc ::opsmpi::exit {args} {
 
 # Import all commands into global (force)
 namespace import -force ::opsmpi::*
+interp alias {} Bcast {} bcast; # Alias maintained for backwards-compatibility
 
 # Strip "filename" argument from argv
 set argv [lassign $argv filename]

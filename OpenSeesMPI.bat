@@ -1,14 +1,38 @@
 @ECHO off
+REM Initialize variables
 SET batdir=%~dp0
-REM Split input arguments for application (last arg is input file)
 SET mpiargs=
-:loop
-SET lastarg=%~1
-SHIFT
-IF "%~1"=="" GOTO continue
-SET mpiargs=%mpiargs% "%lastarg%"
-GOTO loop
-:continue
+SET opsargs=
+
+REM Parse mpiexec arguments
+:ParseMPI
+REM Look ahead to find mpiexec cut-off
+IF "%~2"=="" (
+    REM Last argument is OpenSees file
+    GOTO ParseOPS
+) ELSE (
+    SET mpiargs=%mpiargs% "%~1"
+    SHIFT
+)
+REM Option to have extra OpenSees arguments
+IF "%~1"=="--" (
+    SHIFT
+    GOTO ParseOPS
+)
+GOTO ParseMPI 
+
+REM Parse OpenSees arguments
+:ParseOPS
+IF "%~1"=="" (
+    GOTO Run
+) ELSE (
+    SET opsargs=%opsargs% "%~1"
+    SHIFT
+)
+GOTO ParseOPS
+
+REM Finally, run OpenSeesMPI
+:Run
 REM Dummy call to OpenSees to get header, then call in parallel with opsmpi.
-OpenSees "%batdir%\opsmpi.tcl"
-mpiexec %mpiargs% OpenSees "%batdir%\opsmpi.tcl" "%lastarg%" 2>NUL
+OpenSees NUL
+mpiexec %mpiargs% OpenSees "%batdir%\opsmpi.tcl" %opsargs% 2>NUL
