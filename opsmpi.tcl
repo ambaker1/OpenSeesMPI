@@ -31,7 +31,7 @@
 ################################################################################
 
 # Uses the TclMPI package for MPI bindings
-# Axel Kohlmeyer. (2021). TclMPI: Release 1.1 [Data set]. Zenodo. 
+# Axel Kohlmeyer. (2021). TclMPI: Release 1.2 [Data set]. Zenodo. 
 # DOI: 10.5281/zenodo.545847
 
 # This file replicates the message-passing functionality provided in OpenSeesMP.
@@ -45,13 +45,13 @@
 # is modified to display a "Process terminating" message and to call 
 # ::tclmpi::finalize before calling the real "exit" command.
 
-# Ensure that an input arg exists (used by OpenSeesMPI.bat to get header)
+# Ensure that an input arg exists
 if {[llength $argv] == 0} {
-    return
+    return -code error "Must specify OpenSees file"
 }
 
 # Require the package and initialize the mpi environment
-package require tclmpi
+package require tclmpi 1.2
 ::tclmpi::init
 
 # Define the namespace for opsmpi
