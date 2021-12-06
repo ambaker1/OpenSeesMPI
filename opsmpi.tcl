@@ -32,7 +32,7 @@
 
 # Uses the TclMPI package for MPI bindings
 # Axel Kohlmeyer. (2021). TclMPI: Release 1.2 [Data set]. Zenodo. 
-# DOI: 10.5281/zenodo.545847
+# DOI: 10.5281/zenodo.5637677
 
 # This file replicates the message-passing functionality provided in OpenSeesMP.
 # Additional MPI functionality can be accessed with TclMPI commands.
