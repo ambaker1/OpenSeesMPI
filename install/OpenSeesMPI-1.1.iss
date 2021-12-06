@@ -20,6 +20,7 @@ DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 OutputBaseFilename=OpenSeesMPI-{#MyAppVersion}-Setup
 OutputDir=.
+LicenseFile=../LICENSE.md
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
