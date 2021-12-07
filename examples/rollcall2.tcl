@@ -1,4 +1,4 @@
-# Roll call! Using OpenSeesMPI simplified send/recv syntax
+# Roll call! Using OpenSeesMPI alternative send/recv syntax
 barrier
 if {[getPID] == 0} {
     send -pid 1 [getPID]
