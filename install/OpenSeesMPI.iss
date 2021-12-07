@@ -2,7 +2,7 @@
 ; Creates the self-extracting installer
 
 #define MyAppName "OpenSeesMPI"
-#define MyAppVersion "1.2"
+#define MyAppVersion "1.1"
 #define MyAppPublisher "Alex Baker"
 #include "environment.iss"
 
