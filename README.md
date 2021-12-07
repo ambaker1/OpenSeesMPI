@@ -36,10 +36,6 @@ Functionality is compatible with OpenSeesMP, with a few additional features.
   
   `recv <-pid $pid> <$varName>`
   
-* The command _bcast_ broadcasts data from process 0 to all other processes and returns the same value on all processes, using the TclMPI binding _::tclmpi::bcast_. The alternate spelling _Bcast_ is also valid. This command is not available on older versions of OpenSeesMP.
-
-  `bcast <$data>`
-  
 * The command _barrier_ waits for all processes to reach the barrier, using the TclMPI binding _::tclmpi::barrier_.
   
   `barrier`

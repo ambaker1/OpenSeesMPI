@@ -60,7 +60,7 @@ namespace eval ::opsmpi {
     variable size [::tclmpi::comm_size tclmpi::comm_world]
     variable log 0; # Whether stderr (and puts) are redirected to log
     variable echo 1; # Whether output goes to screen
-    namespace export getPID getNP send recv barrier bcast; # Parallel commands
+    namespace export getPID getNP send recv barrier; # Parallel commands
     namespace export puts logFile exit; # Modified OpenSees commands
 }
 
@@ -161,13 +161,6 @@ proc ::opsmpi::recv {args} {
     return $message
 }
 
-# bcast --
-# Broadcast data from PID 0 to all other processes
-# bcast <$data>
-proc ::opsmpi::bcast {{data ""}} {
-    ::tclmpi::bcast $data tclmpi::auto 0 tclmpi::comm_world
-}
-
 # barrier --
 # Wait until all processes reach barrier
 proc ::opsmpi::barrier {} {
@@ -262,7 +255,6 @@ proc ::opsmpi::exit {args} {
 
 # Import all commands into global (force)
 namespace import -force ::opsmpi::*
-interp alias {} Bcast {} bcast; # Alias maintained for backwards-compatibility
 
 # Strip "filename" argument from argv
 set argv [lassign $argv filename]

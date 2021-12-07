@@ -1,7 +1,7 @@
-# Simple demonstration of broadcast (bcast) command
+# Simple demonstration of broadcasting using send/recv
 if {[getPID] == 0} {
-    bcast "Hello World"
+    send "Hello World"
 } else {
-    set msg [bcast]
+    recv msg
     puts "$msg from [getPID]"
 }
