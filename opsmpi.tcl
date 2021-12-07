@@ -79,66 +79,86 @@ proc ::opsmpi::getNP {} {
 }
 
 # send --
-# Send message to specified PID
-# send <-pid> $pid $data
+# Send message to specified PID or broadcast to all from process 0.
+# send <-pid $pid> $data
 proc ::opsmpi::send {args} {
     variable rank
     variable size
-    # Switch for arity
+    # Switch for send type
     if {[llength $args] == 3} {
-        lassign $args -pid pid data
-    } elseif {[llength $args] == 2} {
-        lassign $args pid data
+        # Send to specific process
+        if {[lindex $args 0] ne "-pid"} {
+            return -code error "want send <-pid pid?> data?"
+        }
+        set pid [lindex $args 1]
+        set data [lindex $args 2]
+        # Check validity of pid input
+        if {![string is integer -strict $pid]} {
+            return -code error "pid must be integer"
+        } elseif {$pid < 0 || $pid >= $size} {
+            return -code error "pid out of range"
+        } elseif {$pid == $rank} {
+            return -code error "cannot send to self"
+        }
+        ::tclmpi::send $data tclmpi::auto $pid 0 tclmpi::comm_world
+    } elseif {[llength $args] == 1} {
+        # Send broadcast message (only for process 0)
+        if {$rank != 0} {
+            return -code error "only process 0 can send broadcast"
+        }
+        set data [lindex $args 0]
+        ::tclmpi::bcast $data tclmpi::auto 0 tclmpi::comm_world
     } else {
-        return -code error "Incorrect number of arguments"
+        return -code error "incorrect number of arguments"
     }
-    # Check validity of pid input
-    if {![string is integer -strict $pid]} {
-        return -code error "pid must be integer"
-    } elseif {$pid < 0 || $pid >= $size} {
-        return -code error "pid out of range"
-    } elseif {$pid == $rank} {
-        return -code error "cannot send to self"
-    }
-    ::tclmpi::send $data tclmpi::auto $pid 0 tclmpi::comm_world
     return
 }
 
 # recv --
-# Receive message to specified PID (or any PID)
-# recv <-pid> $pid <$varName>
+# Receive message to specified PID (or any PID), or receive broadcast from pid 0
+# recv <-pid $pid> <$varName>
 proc ::opsmpi::recv {args} {
     variable rank
     variable size
-    # Check for optional -pid argument, and strip arg list.
-    if {[lindex $args 0] eq {-pid}} {
-        set args [lrange $args 1 end]
-    }
     # Check arity
-    if {[llength $args] < 1 || [llength $args] > 2} {
-        return -code error "Incorrect number of arguments"
+    if {[llength $args] > 3} {
+        return -code error "incorrect number of arguments"
     }
-    # Check validity of pid input
-    set pid [lindex $args 0]
-    if {![string is integer -strict $pid]} {
-        if {$pid in {ANY ANY_SOURCE MPI_ANY_SOURCE}} {
-            set pid tclmpi::any_source
-        } else {
-            return -code error "pid must be integer or \"ANY\""
+    # Switch for receive type
+    if {[llength $args] > 1} {
+        # Receive from specific process
+        if {[lindex $args 0] ne "-pid"} {
+            return -code error "want recv <-pid pid?> <varName?>"
         }
-    } elseif {$pid < 0 || $pid >= $size} {
-        return -code error "pid out of range"
-    } elseif {$pid == $rank} {
-        return -code error "cannot receive from self"
+        # Check validity of pid input
+        set pid [lindex $args 1]
+        if {![string is integer -strict $pid]} {
+            if {$pid in {ANY ANY_SOURCE MPI_ANY_SOURCE}} {
+                set pid tclmpi::any_source
+            } else {
+                return -code error "pid must be integer or \"ANY\""
+            }
+        } elseif {$pid < 0 || $pid >= $size} {
+            return -code error "pid out of range"
+        } elseif {$pid == $rank} {
+            return -code error "cannot receive from self"
+        }
+        set message [::tclmpi::recv tclmpi::auto $pid tclmpi::any_tag \
+            tclmpi::comm_world]
+    } else {
+        # Receive from broadcast
+        if {$rank == 0} {
+            return -code error "cannot receive from self"
+        }
+        set message [::tclmpi::bcast "" tclmpi::auto 0 tclmpi::comm_world]
     }
     # Option to link to variable
-    if {[llength $args] == 2} {
-        set varName [lindex $args 1]
-        upvar $varName message
+    if {[llength $args] % 2 == 1} {
+        set varName [lindex $args end]
+        upvar $varName var
+        set var $message
     }
-    # Call TclMPI binding, saving to message variable and returning the value
-    set message [::tclmpi::recv tclmpi::auto $pid tclmpi::any_tag \
-            tclmpi::comm_world]
+    return $message
 }
 
 # bcast --
