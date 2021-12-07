@@ -1,16 +1,16 @@
 # OpenSeesMPI
 OpenSeesMPI uses the TclMPI package [1] to replicate the message passing functionality of OpenSeesMP [2], without requiring a parallel version of OpenSees. 
 
-## Requirements:
+## Requirements
 Must have mpiexec and OpenSees installed and on the path. OpenSees must be installed with a complete Tcl installation, and the TclMPI package must be installed and available via "package require". 
 
-## Installation and Basic Use:
+## Installation and Basic Use
 Run the installer in the latest release.
 Then, OpenSeesMPI can be called as shown below, where $np represents the number of parallel processes, and $inputFile represents the Tcl input script.
 
 `OpenSeesMPI -n $np $inputfile`
   
-## Advanced Use:
+## Advanced Use
 Arguments up to the last argument or up to "--" are taken as mpiexec options.
 The remaining arguments are taken as the input file and the input arguments.
 If input arguments are desired, the option terminator "--" must be used.
@@ -28,7 +28,7 @@ Functionality is compatible with OpenSeesMP, with a few additional features.
   
   `getNP` 
   
-* The command _send_ either sends $data from the current process to process $pid, or broadcasts $data to all other processes, using the TclMPI bindings _::tclmpi::send_ and _::tclmpi::bcast_.
+* The command _send_ either sends $data from the current process to process $pid, or broadcasts $data to all other processes (must be called from process 0), using the TclMPI bindings _::tclmpi::send_ and _::tclmpi::bcast_.
   
   `send <-pid $pid> $data`
   
