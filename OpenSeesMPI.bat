@@ -4,8 +4,8 @@ REM OpenSeesMPI, Portable MPI for OpenSees
 REM Copyright (C) 2021 Alex Baker, ambaker1@mtu.edu
 REM All rights reserved. 
 REM 
-REM See the file "opsmpi.tcl" for information on usage, 
-REM redistribution, and for a DISCLAIMER OF ALL WARRANTIES.
+REM See the file "LICENSE.txt" for information on usage, redistribution, and 
+REM for a DISCLAIMER OF ALL WARRANTIES.
 REM ----------------------------------------------------------------------------
 
 REM Initialize variables
