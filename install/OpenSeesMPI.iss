@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "OpenSeesMPI"
-#define MyAppVersion "1.1"
+#define MyAppVersion "1.2"
 #define MyAppPublisher "Alex Baker"
 #include "environment.iss"
 
@@ -30,8 +30,8 @@ ChangesEnvironment=true
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "..\OpenSeesMPI.bat"; DestDir: "{app}\bin"; Flags: ignoreversion
-Source: "..\opsmpi.tcl"; DestDir: "{app}\bin"; Flags: ignoreversion 
+Source: "..\OpenSeesMPI.bat"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\opsmpi.tcl"; DestDir: "{app}"; Flags: ignoreversion 
 Source: "..\README.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\LICENSE.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\examples\*"; DestDir: "{app}\examples"; Flags: ignoreversion
@@ -45,11 +45,11 @@ Name: envPath; Description: "Add to PATH variable"
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
     if (CurStep = ssPostInstall) and IsTaskSelected('envPath')
-    then EnvAddPath(ExpandConstant('{app}') +'\bin');
+    then EnvAddPath(ExpandConstant('{app}'));
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
     if CurUninstallStep = usPostUninstall
-    then EnvRemovePath(ExpandConstant('{app}') +'\bin');
+    then EnvRemovePath(ExpandConstant('{app}'));
 end;
