@@ -1,11 +1,13 @@
 # OpenSeesMPI
 OpenSeesMPI uses the TclMPI package [1] to replicate the message passing functionality of OpenSeesMP [2], without requiring a parallel version of OpenSees. 
 
-## Requirements
-Must have mpiexec and OpenSees installed and on the path. OpenSees must be installed with a complete Tcl installation, and the TclMPI package must be installed and available via "package require". 
-
 ## Installation and Basic Use
-Run the installer in the latest release.
+* Install mpiexec
+* Install [Tcl](https://platform.activestate.com/ambaker/ActiveTcl-8.6.10)
+* Install [OpenSees](https://github.com/ambaker1/OpenSees-Installer)
+* Install [TclMPI](https://github.com/akohlmey/tclmpi)
+* Install OpenSeesMPI from this repository's latest release.
+
 Then, OpenSeesMPI can be called as shown below, where $np represents the number of parallel processes, and $inputFile represents the Tcl input script.
 
 `OpenSeesMPI -n $np $inputfile`
